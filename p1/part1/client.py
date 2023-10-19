@@ -63,26 +63,51 @@ def stage_b(num: int, length: int, udp_port: int, secretA: int):
 
   return b_response
 
-def stage_c(tcp_port: int, secretB: int):
+def stage_c(tcp_port: int):
   server_address = (url, tcp_port)
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
   sock.connect(server_address)
-  
+
+  c_reponse = sock.recv(n_bytes)
+
   sock.close()
-  return ''
+  return c_reponse
+
+def stage_d(tcp_port, num2, len2, secretC, c):
+  server_address = (url, tcp_port)
+  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+  sock.connect(server_address)
+  sock.settimeout(1)
+
+  header = create_header(len2, secretC)
+
+  for _ in range(num2):
+    message = bytes(c * len2)
+    message += bytes(len2 % 4)
+
+    sock.sendall(header + message)
+    print("sent", header + message)
+
+  d_reponse = sock.recv(n_bytes)
+
+  sock.close()
+  return d_reponse
 
 if __name__ == '__main__':
   a_response = stage_a()
   num, length, udp_port, secretA = struct.unpack('>IIII', a_response[12:])
-
-  print("stage a output")
-  print(num, length, udp_port, secretA)
+  print("stage a output", num, length, udp_port, secretA)
 
   b_response = stage_b(num, length, udp_port, secretA)
   tcp_port, secretB = struct.unpack('>II', b_response[12:])
-  
-  print("stage b output")
-  print(tcp_port, secretB)
+  print("stage b output", tcp_port, secretB)
 
-  c_reponse = stage_c(tcp_port, secretB)
+  c_response = stage_c(tcp_port)
+  num2, len2, secretC, c = struct.unpack('>IIIc', c_response[12:25])
+  print("stage c output", num2, len2, secretC, c)
+
+  d_response = stage_d(tcp_port, num2, len2, secretC, c)
+  print(d_response)
+  print(d_response[12:].hex())
