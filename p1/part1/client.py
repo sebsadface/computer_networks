@@ -33,10 +33,10 @@ def stage_a():
 def stage_b(num: int, length: int, udp_port: int, secretA: int):
   server_address = (url, udp_port)
   sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  sock.settimeout(1)
+  sock.settimeout(0.5)
 
   for i in range(num):
-    retries = 10
+    retries = 15
 
     while retries > 0:
       try:
@@ -44,7 +44,7 @@ def stage_b(num: int, length: int, udp_port: int, secretA: int):
 
         message = i.to_bytes(4, byteorder='big')
         message += bytes(length)
-        message += bytes(length % 4)
+        message += bytes(4 - (len(message) % 4))
 
         sock.sendto(header + message, server_address)
 
@@ -63,36 +63,22 @@ def stage_b(num: int, length: int, udp_port: int, secretA: int):
 
   return b_response
 
-def stage_c(tcp_port: int):
-  server_address = (url, tcp_port)
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-  sock.connect(server_address)
-
+def stage_c(sock: socket):
   c_reponse = sock.recv(n_bytes)
 
-  sock.close()
   return c_reponse
 
-def stage_d(tcp_port, num2, len2, secretC, c):
-  server_address = (url, tcp_port)
-  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-  sock.connect(server_address)
-  sock.settimeout(1)
-
+def stage_d(sock: socket, num2: int, len2: int, secretC: int, c: bytes):
   header = create_header(len2, secretC)
-
+  message = bytes(c * len2)
+  if len(message) % 4 != 0:
+    message += bytes(4 - (len(message) % 4))
+  
   for _ in range(num2):
-    message = bytes(c * len2)
-    message += bytes(len2 % 4)
-
     sock.sendall(header + message)
-    print("sent", header + message)
 
   d_reponse = sock.recv(n_bytes)
-
-  sock.close()
+ 
   return d_reponse
 
 if __name__ == '__main__':
@@ -104,10 +90,21 @@ if __name__ == '__main__':
   tcp_port, secretB = struct.unpack('>II', b_response[12:])
   print("stage b output", tcp_port, secretB)
 
-  c_response = stage_c(tcp_port)
+  # Connect TCP socket
+  server_address = (url, tcp_port)
+  sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+  sock.connect(server_address)
+  sock.settimeout(1)
+
+  c_response = stage_c(sock)
   num2, len2, secretC, c = struct.unpack('>IIIc', c_response[12:25])
   print("stage c output", num2, len2, secretC, c)
 
-  d_response = stage_d(tcp_port, num2, len2, secretC, c)
-  print(d_response)
-  print(d_response[12:].hex())
+  d_response = stage_d(sock, num2, len2, secretC, c)
+  sock.close()
+
+  secretD = int.from_bytes(d_response[12:], byteorder='big')
+  print("stage d output", secretD)
+  
+  print("secrets:", secretA, secretB, secretC, secretD)
