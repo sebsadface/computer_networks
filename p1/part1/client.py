@@ -2,6 +2,7 @@ import socket
 import struct
 
 n_bytes = 1024
+HEADER_SIZE = 12
 url = "attu3.cs.washington.edu"
 
 step = 1
@@ -49,7 +50,7 @@ def stage_b(num: int, length: int, udp_port: int, secretA: int):
         sock.sendto(header + message, server_address)
 
         response, _ = sock.recvfrom(n_bytes)
-        print(response.hex())
+        print("ack", response.hex())
         break
 
       except socket.timeout:
@@ -82,29 +83,33 @@ def stage_d(sock: socket, num2: int, len2: int, secretC: int, c: bytes):
   return d_reponse
 
 if __name__ == '__main__':
+  print("STAGE A")
   a_response = stage_a()
-  num, length, udp_port, secretA = struct.unpack('>IIII', a_response[12:])
-  print("stage a output", num, length, udp_port, secretA)
+  num, length, udp_port, secretA = struct.unpack('>IIII', a_response[HEADER_SIZE:])
+  print("stage a output", num, length, udp_port, secretA, "\n")
 
+  print("STAGE B")
   b_response = stage_b(num, length, udp_port, secretA)
-  tcp_port, secretB = struct.unpack('>II', b_response[12:])
-  print("stage b output", tcp_port, secretB)
+  tcp_port, secretB = struct.unpack('>II', b_response[HEADER_SIZE:])
+  print("stage b output", tcp_port, secretB, "\n")
 
-  # Connect TCP socket
+  # Connect to TCP socket
   server_address = (url, tcp_port)
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
   sock.connect(server_address)
   sock.settimeout(1)
 
+  print("STAGE C")
   c_response = stage_c(sock)
-  num2, len2, secretC, c = struct.unpack('>IIIc', c_response[12:25])
-  print("stage c output", num2, len2, secretC, c)
+  num2, len2, secretC, c = struct.unpack('>IIIc', c_response[HEADER_SIZE : HEADER_SIZE + 13])
+  print("stage c output", num2, len2, secretC, c, "\n")
 
+  print("STAGE D")
   d_response = stage_d(sock, num2, len2, secretC, c)
   sock.close()
 
-  secretD = int.from_bytes(d_response[12:], byteorder='big')
-  print("stage d output", secretD)
+  secretD = int.from_bytes(d_response[HEADER_SIZE:], byteorder='big')
+  print("stage d output", secretD, "\n")
   
   print("secrets:", secretA, secretB, secretC, secretD)
