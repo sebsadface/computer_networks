@@ -123,6 +123,7 @@ def stage_b(num, length, udp_port, secretA, student_id):
 
             except socket.timeout:
                 print(f"Stage b, port: {udp_port}: No data received for 3 seconds")
+                new_socket.close()
                 continue
 
         # all packets have been acked, send the response
@@ -169,6 +170,7 @@ def stage_c_d(secretB, tcp_port, student_id):
 
         except socket.timeout:
             print(f"Stage c, port: {tcp_port}: No data received for 3 seconds")
+            conn.close()
             return None
 
 
