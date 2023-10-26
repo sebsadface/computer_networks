@@ -1,6 +1,6 @@
 ## Names:
-- Sebastian (ll57) 
-- Andrew (andrew64)
+- Sebastian Liu (ll57) 
+- Andrew Wu (andrew64)
 - Adrien Delepine (adriende)
 
 ## Secrets
