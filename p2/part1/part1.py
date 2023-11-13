@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+  
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
@@ -9,10 +9,10 @@ from mininet.cli import CLI
 class part1_topo(Topo):
     def build(self):
         s1 = self.addSwitch("s1")
-        h1 = self.addHost("h1")
-        h2 = self.addHost("h2")
-        h3 = self.addHost("h3")
-        h4 = self.addHost("h4")
+        h1 = self.addHost("h1", ip="10.0.0.1/24")
+        h2 = self.addHost("h2", ip="10.0.0.2/24")
+        h3 = self.addHost("h3", ip="10.0.0.3/24")
+        h4 = self.addHost("h4", ip="10.0.0.4/24")
         self.addLink(h1, s1)
         self.addLink(h2, s1)
         self.addLink(h3, s1)
