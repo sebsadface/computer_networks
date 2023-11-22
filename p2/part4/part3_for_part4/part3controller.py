@@ -3,11 +3,11 @@
 # based on Lab Final from UCSC's Networking Class
 # which is based on of_tutorial by James McCauley
 
-from pox.lib.packet import ipv4, arp
+from pox.lib.packet import ipv4
 
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
-from pox.lib.addresses import IPAddr, IPAddr6, EthAddr
+from pox.lib.addresses import IPAddr
 
 log = core.getLogger()
 
