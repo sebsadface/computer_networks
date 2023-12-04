@@ -167,7 +167,7 @@ def bufferbloat():
         while True:
             # do the measurement (say) 3 times.
             out = h2.popen(cmd, shell=True, stdout=PIPE, text=True)
-            t.append(out.stdout.readline())
+            t.append(float(out.stdout.readline()))
 
             sleep(5)
             now = time()
@@ -176,7 +176,6 @@ def bufferbloat():
                 break
             print("%.1fs left..." % (args.time - delta))
         
-        print(t)
         mean = statistics.mean(t)
         stdev = statistics.stdev(t)
 
@@ -187,8 +186,8 @@ def bufferbloat():
     # README and explain.
     mean, stdev = measure()
 
-    print("Average fetch time" + mean)
-    print("Standard deviation of fetch time" + stdev)
+    print("Average fetch time " + str(mean))
+    print("Standard deviation of fetch time " + str(stdev))
 
     # Hint: The command below invokes a CLI which you can use to
     # debug.  It allows you to run arbitrary commands inside your
