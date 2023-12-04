@@ -5,6 +5,7 @@ from mininet.net import Mininet
 from mininet.log import lg, info
 from mininet.util import dumpNodeConnections
 from mininet.cli import CLI
+from mininet.node import OVSBridge
 import statistics
 
 from subprocess import Popen, PIPE
@@ -68,11 +69,10 @@ class BBTopo(Topo):
 
         # Here I have created a switch.  If you change its name, its
         # interface names will change from s0-eth1 to newname-eth1.
-        switch = self.addSwitch('s0')
+        switch = self.addSwitch('s0', cls=OVSBridge)
 
-        delay = '%fms' % args.delay
-        self.addLink(h1, switch, bw=args.bw_host, delay=delay)
-        self.addLink(h2, switch, bw=args.bw_net, delay=delay, max_queue_size=args.maxq)
+        self.addLink(h1, switch, bw=args.bw_host, delay=args.delay)
+        self.addLink(switch, h2, bw=args.bw_net, delay=args.delay, max_queue_size=args.maxq)
 
 # Simple wrappers around monitoring utilities.  You are welcome to
 # contribute neatly written (using classes) monitoring scripts for
@@ -167,8 +167,7 @@ def bufferbloat():
         while True:
             # do the measurement (say) 3 times.
             out = h2.popen(cmd, shell=True, stdout=PIPE, text=True)
-            print(out.stdout.readline())
-            t.append(float(out.stdout.readline()))
+            t.append(out.stdout.readline())
 
             sleep(5)
             now = time()
@@ -177,6 +176,7 @@ def bufferbloat():
                 break
             print("%.1fs left..." % (args.time - delta))
         
+        print(t)
         mean = statistics.mean(t)
         stdev = statistics.stdev(t)
 
