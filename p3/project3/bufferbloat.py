@@ -90,7 +90,7 @@ def start_iperf(net):
     # Start the iperf client on h1.  Ensure that you create a
     # long lived TCP flow.
     # client = ... 
-    client = h1.popen(f"iperf -c {h2.IP()} -t {args.time}")
+    client = h1.popen(f"iperf -c {h2.IP()} -t {args.time * 2}")
 
 def start_qmon(iface, interval_sec=0.1, outfile="q.txt"):
     monitor = Process(target=monitor_qlen,
