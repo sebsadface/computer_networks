@@ -1,5 +1,5 @@
 Name:
-UWNetID:
+UWNetID: adriende
 
 Name:
 UWNetID:
@@ -12,7 +12,7 @@ Instructions to reproduce the results:
 
 Answers to the questions:
 Part 2
-  1. TODO
+  1. When q=20, the average webpage fetch time was 0.496 seconds with a standard deviation of 0.596 seconds. When q=100, the average fetch time was 1.283 seconds with a standard deviation of 0.244 seconds. 
   2. TODO
   3. TODO
   4. TODO

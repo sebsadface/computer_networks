@@ -110,8 +110,7 @@ def start_ping(net):
     h1 = net.get('h1')
     h2 = net.get('h2')
 
-    cmd = f"ping -i 0.1 {h2.IP()} > {args.dir}/ping.txt"
-    # cmd = f"ping -w {args.time} -i 0.1 {h2.IP()} > {args.dir}/ping_results_{args.maxq}.txt"
+    cmd = f"ping -i 0.1 -w {args.time} {h2.IP()} > {args.dir}/ping.txt"
     ping = h1.popen(cmd, shell=True)
 
 def start_webserver(net):
@@ -160,7 +159,6 @@ def bufferbloat():
     h1 = net.get('h1')
     h2 = net.get('h2')
     cmd = "curl -o /dev/null -s -w %{time_total} " + f"{h1.IP()}/http/index.html"
-
     def measure():
         start_time = time()
         t = []
