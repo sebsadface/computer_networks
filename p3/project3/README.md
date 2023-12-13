@@ -27,5 +27,9 @@ Part 2
 Part 3
 
 1. When q=20, the average webpage fetch time was 0.403 seconds with a standard deviation of 0.619 seconds. When q=100, the average fetch time was 0.307 seconds with a standard deviation of 0.696 seconds.
-2. TODO
-3. TODO
+2. The queue length of 100 gives a lower fetch time, very different from Part 2 where
+   because of the TCP protocol we used the bigger the queue length the higher the latency.
+3. Yes, the TCP-BBR protocol is vastly better at keeping queues as empty as possible
+   throughout the sending of packets. It does this by actively adjusting the rate at which it sends packets based on what it knows the RTT and bandwidth are at the moment,
+   keeping queues as empty as possible.
+4. I'd say bufferbloat is mostly mitigated for now, but this doesn't mean that it can't pop up in the future, especially since networking is such a constantly changing and decentralized field. The TCP BBR developed by googel effectively mitigates the probelmm is what I would say.
